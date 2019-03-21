@@ -1,0 +1,69 @@
+Identificador: Letras, numeros de base decimal y  guiones bajos; empiezan por letra
+numeric_integer_const : opcionalmente precedida por + o -
+numeric_real_const:
+					 -Punto fijo 
+					 -Exponencial
+					  -Mixto
+string_const: contstantes literales entre comillas simples
+comentarios de propósito general:
+								 -De una línea ente {}
+								 -Varias líneas entre (*  *)
+
+--------------------------------------------
+
+PRG ::= "program" identifier ";" BLQ "."
+BLQ ::= DCLLIST "begin" SENTLIST "end"
+DCLLIST ::= ʎ | DCLLIST DCL
+SENTLIST ::= SENT | SENTLIST SENT 
+
+DCLLIST : Declaraciones
+DCL ::= DEFCTE | DEFVAR | DEFPROC | DEFFUN 
+DEFCTE ::= "const" CTELIST 
+CTELIST ::= identifier "=" SIMPVALUE ";"
+ | CTELIST identifier "=" SIMPVALUE ";"
+SIMPVALUE ::= numeric_integer_const | numeric_real_const
+| string_const 
+DEFVAR ::= "var" DEFVARLIST ";"
+DEFVARLIST ::= VARLIST ":" TBAS
+ | DEFVARLIST ";" VARLIST ":" TBAS
+VARLIST ::= identifier | identifier "," VARLIST
+DEFPROC ::= "procedure" identifier FORMAL_PARAMLIST ";" BLQ ";"
+DEFFUN ::= "function" identifier FORMAL_PARAMLIST ":" TBAS ";" BLQ ";"
+FORMAL_PARAMLIST ::= ʎ | "(" FORMAL_PARAM ")"
+FORMAL_PARAM ::= VARLIST ":" TBAS
+ | VARLIST ":" TBAS ";" FORMAL_PARAM
+TBAS ::= "INTEGER" | "REAL"
+
+Sentencias del Programa:
+
+SENTLIST : Progrma principal
+SENT ::= ASIG ";" | PROC_CALL ";"
+ASIG ::= ID ":=" EXP
+ID := identifier
+EXP ::= EXP OP EXP | FACTOR
+OP ::= OPARIT
+OPARIT ::= "+" | "-" | "*" | "div" | "mod"
+FACTOR ::= SIMPVALUE | "(" EXP ")" | identifier SUBPPARAMLIST
+SUBPPARAMLIST ::= lambda | "(" EXPLIST ")"
+EXPLIST ::= EXP | EXP "," EXPLIST
+PROC_CALL ::= identifier SUBPPARAMLIST 
+
+ANOTACIONES:
+Los comentarios que se encuentren en el lenguaje fuente deben ser ignorados (no aparecerán en el
+lenguaje final). 
+INTEGER Y REAL :  “int” y “float”
+“+”, “-“ y “*” : igual en lenguae final
+“div” y “mod: “div” y “mod"
+
+
+EL PROGRAMA ESTÁ COMPUESTO POR DOS PARTES (DEFINES(declaración de constantes) Y PARTES(Conjunto de delcaraciones de funciones))
+PROGRAM ::= DEFINES PARTES
+DEFINES ::= ʎ | "#define" ident CTES DEFINES
+CTES ::= constint | constfloat | constlit
+PARTES ::= PART PARTES | PART
+PART ::= TYPE RESTPART
+RESTPART ::= ident "(" LISTPARAM ")" BLQ
+| ident "(" "void" ")" BLQ
+BLQ ::= "{" SENTLIST "}"
+LISTPARAM ::= LISTPARAM "," TYPE ident | TYPE ident
+TYPE ::= "void" | "int" | "float" 
