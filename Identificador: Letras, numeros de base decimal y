@@ -67,3 +67,4 @@ RESTPART ::= ident "(" LISTPARAM ")" BLQ
 BLQ ::= "{" SENTLIST "}"
 LISTPARAM ::= LISTPARAM "," TYPE ident | TYPE ident
 TYPE ::= "void" | "int" | "float" 
+Mñlknbjvhcgvjbknlmñknbjvhcgfxchjvbknlmñ,
