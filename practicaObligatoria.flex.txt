@@ -30,6 +30,7 @@ to="to"
 downto="downto"
 programa="program"
 variables="var"
+unit = "UNIT"
 
 /* OPERADORES */
 opMas = "+"
@@ -58,6 +59,7 @@ coma = ","
 dosPuntos=":"
 abrirC = "["
 cerrarC = "]"
+constante = "const"
 
 /* IDENTIFICADORES */
 identificadores = ([:letter:])([:letter:]|[0-9]|"_")*
@@ -100,7 +102,9 @@ tabuladores = [\t]
 {downto}    {return new java_cup.runtime.Symbol(sym.downto,yyline,yycolumn);}
 {programa}  {return new java_cup.runtime.Symbol(sym.programa,yyline,yycolumn);}
 {variables} {return new java_cup.runtime.Symbol(sym.variables,yyline,yycolumn);}
-{punto}			{return new java_cup.runtime.Symbol(sym.punto,yyline,yycolumn);}
+{punto}		{return new java_cup.runtime.Symbol(sym.punto,yyline,yycolumn);}
+{unit}		{return new java_cup.runtime.Symbol(sym.unit,yyline,yycolumn);}
+
 
 
 {opMas}			{return new java_cup.runtime.Symbol(sym.opMas,yyline,yycolumn);}
@@ -127,6 +131,7 @@ tabuladores = [\t]
 {dosPuntos}  {return new java_cup.runtime.Symbol(sym.dosPuntos,yyline,yycolumn);}
 {abrirC}		{return new java_cup.runtime.Symbol(sym.abrirC,yyline,yycolumn);}
 {cerrarC}		{return new java_cup.runtime.Symbol(sym.cerrarC,yyline,yycolumn);}
+{constante}		{return new java_cup.runtime.Symbol(sym.constante,yyline,yycolumn);}
 
 {identificadores}	{return new java_cup.runtime.Symbol(sym.identificador,yyline,yycolumn,yytext());}
 
