@@ -16,7 +16,6 @@ procedimiento="PROCEDURE"
 begin="BEGIN"
 end="END"
 vacio="VOID"
-
 estIf = "if"
 estThen = "then"
 estElse = "else"
@@ -24,7 +23,6 @@ estFor = "for"
 estWhile = "while"
 estDo = "do"
 estUntil = "until"
-estStruct = "struct"
 estRepetir="repeat"
 punto = "."
 to="to"
@@ -87,7 +85,7 @@ tabuladores = [\t]
 {vacio}			{return new java_cup.runtime.Symbol(sym.vacio,yyline,yycolumn);}
 {entero}		{return new java_cup.runtime.Symbol(sym.entero,yyline,yycolumn);}
 {real}			{return new java_cup.runtime.Symbol(sym.real,yyline,yycolumn);}
-{devolver}		{return new java_cup.runtime.Symbol(sym.devolver,yyline,yycolumn);}
+
 {estIf}			{return new java_cup.runtime.Symbol(sym.estIf,yyline,yycolumn);}
 {estThen}		{return new java_cup.runtime.Symbol(sym.estThen,yyline,yycolumn);}
 {estElse}		{return new java_cup.runtime.Symbol(sym.estElse,yyline,yycolumn);}
@@ -95,8 +93,14 @@ tabuladores = [\t]
 {estWhile}		{return new java_cup.runtime.Symbol(sym.estWhile,yyline,yycolumn);}
 {estDo}			{return new java_cup.runtime.Symbol(sym.estDo,yyline,yycolumn);}
 {estUntil}		{return new java_cup.runtime.Symbol(sym.estUntil,yyline,yycolumn);}
-{estStruct}		{return new java_cup.runtime.Symbol(sym.estStruct,yyline,yycolumn);}
+{estRepetir} {return new java_cup.runtime.Symbol(sym.estRepetir,yyline,yycolumn);}
+
+{to}        {return new java_cup.runtime.Symbol(sym.to,yyline,yycolumn);}
+{downto}    {return new java_cup.runtime.Symbol(sym.downto,yyline,yycolumn);}
+{programa}  {return new java_cup.runtime.Symbol(sym.programa,yyline,yycolumn);}
+{variables} {return new java_cup.runtime.Symbol(sym.variables,yyline,yycolumn);}
 {punto}			{return new java_cup.runtime.Symbol(sym.punto,yyline,yycolumn);}
+
 
 {opMas}			{return new java_cup.runtime.Symbol(sym.opMas,yyline,yycolumn);}
 {opMenos}		{return new java_cup.runtime.Symbol(sym.opMenos,yyline,yycolumn);}
@@ -119,19 +123,19 @@ tabuladores = [\t]
 {cerrarLl}		{return new java_cup.runtime.Symbol(sym.cerrarLl,yyline,yycolumn);}
 {puntoComa}		{return new java_cup.runtime.Symbol(sym.puntoComa,yyline,yycolumn);}
 {coma}			{return new java_cup.runtime.Symbol(sym.coma,yyline,yycolumn);}
+{dosPuntos}  {return new java_cup.runtime.Symbol(sym.dosPuntos,yyline,yycolumn);}
 {abrirC}		{return new java_cup.runtime.Symbol(sym.aperturaC,yyline,yycolumn);}
 {cerrarC}		{return new java_cup.runtime.Symbol(sym.cierreC,yyline,yycolumn);}
 
 {identificadores}	{return new java_cup.runtime.Symbol(sym.identificador,yyline,yycolumn,yytext());}
 
-{cero}			{return new java_cup.runtime.Symbol(sym.constEntera,yyline,yycolumn,yytext());}
+{cero}			{return new java_cup.runtime.Symbol(sym.cero,yyline,yycolumn,yytext());}
 {enteroDecimal}		{return new java_cup.runtime.Symbol(sym.constEntera,yyline,yycolumn,yytext());}
-{enteroOctal}		{return new java_cup.runtime.Symbol(sym.constEntera,yyline,yycolumn,yytext());}
-{enteroHexadecimal}	{return new java_cup.runtime.Symbol(sym.constEntera,yyline,yycolumn,yytext());}
+
 
 {realDecimal}		{return new java_cup.runtime.Symbol(sym.constReal,yyline,yycolumn,yytext());}
-{realOctal}		{return new java_cup.runtime.Symbol(sym.constReal,yyline,yycolumn,yytext());}
-{realHexadecimal}	{return new java_cup.runtime.Symbol(sym.constReal,yyline,yycolumn,yytext());}
+{realExponencial} {return new java_cup.runtime.Symbol(sym.constRealExp,yyline,yycolumn,yytext());}
+{realMixto}  {return new java_cup.runtime.Symbol(sym.constRealMixto,yyline,yycolumn,yytext());}
 
 {comentarioLinea}	{;}
 {comentarioParrafo}	{;}
