@@ -1,0 +1,134 @@
+import java_cup.runtime.*;
+
+
+%%
+
+%line
+%class AnalizadorLexico
+%cup
+%column
+
+/* PALABRAS RESERVADAS */
+vacio = "void"
+entero = "int"
+real = "float"
+devolver = "return"
+estIf = "if"
+estThen = "then"
+estElse = "else"
+estFor = "for"
+estWhile = "while"
+estDo = "do"
+estUntil = "until"
+estStruct = "struct"
+punto = "."
+
+/* OPERADORES */
+opMas = "+"
+opMenos = "-"
+opMultiplicacion = "*"
+opDivision = "/"
+opMayor = ">"
+opMenor = "<"
+opMayorIgual = ">="
+opMenorIgual = "<="
+opModulo = "%"
+opAsignacion = "="
+opIgual = "=="
+opNot = "not"
+opAnd = "and"
+opOr= "or"
+
+/* SIMBOLOS RESERVADOS */
+abrirP = "("
+cerrarP = ")"
+abrirLl = "{"
+cerrarLl = "}"
+puntoComa = ";"
+coma = ","
+abrirC = "["
+cerrarC = "]"
+
+/* IDENTIFICADORES */
+identificadores = ([:letter:]|"&")([:letter:]|[0-9]|"$"|"_")*
+
+/* NUMEROS ENTEROS */
+cero = "0"
+enteroDecimal = ("+"|"-")?[1-9][0-9]*
+enteroOctal = 0("+"|"-")?[0-9]+
+enteroHexadecimal = "0x"("+"|"-")?([0-9]|[A-F])+
+
+/* NUMEROS REALES */
+realDecimal = ("+"|"-")?([1-9][0-9]*+"."|"0.")[0-9]+
+realOctal = 0("+"|"-")?[0-9]+"."[0-9]+
+realHexadecimal = "0x"("+"|"-")?([0-9]|[A-F])+"."([0-9]|[A-F])+
+
+/* COMENTARIOS */
+comentarioLinea = "//".*"\r\n"
+comentarioParrafo = "/*"(.|"\r\n")*"*/"
+
+/* CONSTANTES LITERALES */
+constanteLiteral = "'"([^"'"]|"\\'")+"'"
+
+/* CARACTERES ESPECIALES */
+espacio = " "
+saltos = [\r\n]
+tabuladores = [\t]
+%%
+{vacio}			{return new java_cup.runtime.Symbol(sym.vacio,yyline,yycolumn);}
+{entero}		{return new java_cup.runtime.Symbol(sym.entero,yyline,yycolumn);}
+{real}			{return new java_cup.runtime.Symbol(sym.real,yyline,yycolumn);}
+{devolver}		{return new java_cup.runtime.Symbol(sym.devolver,yyline,yycolumn);}
+{estIf}			{return new java_cup.runtime.Symbol(sym.estIf,yyline,yycolumn);}
+{estThen}		{return new java_cup.runtime.Symbol(sym.estThen,yyline,yycolumn);}
+{estElse}		{return new java_cup.runtime.Symbol(sym.estElse,yyline,yycolumn);}
+{estFor}		{return new java_cup.runtime.Symbol(sym.estFor,yyline,yycolumn);}
+{estWhile}		{return new java_cup.runtime.Symbol(sym.estWhile,yyline,yycolumn);}
+{estDo}			{return new java_cup.runtime.Symbol(sym.estDo,yyline,yycolumn);}
+{estUntil}		{return new java_cup.runtime.Symbol(sym.estUntil,yyline,yycolumn);}
+{estStruct}		{return new java_cup.runtime.Symbol(sym.estStruct,yyline,yycolumn);}
+{punto}			{return new java_cup.runtime.Symbol(sym.punto,yyline,yycolumn);}
+
+{opMas}			{return new java_cup.runtime.Symbol(sym.opMas,yyline,yycolumn);}
+{opMenos}		{return new java_cup.runtime.Symbol(sym.opMenos,yyline,yycolumn);}
+{opMultiplicacion}	{return new java_cup.runtime.Symbol(sym.opMultiplicacion,yyline,yycolumn);}
+{opDivision}		{return new java_cup.runtime.Symbol(sym.opDivision,yyline,yycolumn);}
+{opMayor}		{return new java_cup.runtime.Symbol(sym.opMayor,yyline,yycolumn);}
+{opMenor}		{return new java_cup.runtime.Symbol(sym.opMenor,yyline,yycolumn);}
+{opMayorIgual}		{return new java_cup.runtime.Symbol(sym.opMayorIgual,yyline,yycolumn);}
+{opMenorIgual}		{return new java_cup.runtime.Symbol(sym.opMenorIgual,yyline,yycolumn);}
+{opModulo}		{return new java_cup.runtime.Symbol(sym.opModulo,yyline,yycolumn);}
+{opAsignacion}		{return new java_cup.runtime.Symbol(sym.opAsignacion,yyline,yycolumn);}
+{opIgual}		{return new java_cup.runtime.Symbol(sym.opIgual,yyline,yycolumn);}
+{opNot}			{return new java_cup.runtime.Symbol(sym.opNot,yyline,yycolumn);}
+{opAnd}			{return new java_cup.runtime.Symbol(sym.opAnd,yyline,yycolumn);}
+{opOr}			{return new java_cup.runtime.Symbol(sym.opOr,yyline,yycolumn);}
+
+{abrirP}		{return new java_cup.runtime.Symbol(sym.abrirP,yyline,yycolumn);}
+{cerrarP}		{return new java_cup.runtime.Symbol(sym.cerrarP,yyline,yycolumn);}
+{abrirLl}		{return new java_cup.runtime.Symbol(sym.abrirLl,yyline,yycolumn);}
+{cerrarLl}		{return new java_cup.runtime.Symbol(sym.cerrarLl,yyline,yycolumn);}
+{puntoComa}		{return new java_cup.runtime.Symbol(sym.puntoComa,yyline,yycolumn);}
+{coma}			{return new java_cup.runtime.Symbol(sym.coma,yyline,yycolumn);}
+{abrirC}		{return new java_cup.runtime.Symbol(sym.aperturaC,yyline,yycolumn);}
+{cerrarC}		{return new java_cup.runtime.Symbol(sym.cierreC,yyline,yycolumn);}
+
+{identificadores}	{return new java_cup.runtime.Symbol(sym.identificador,yyline,yycolumn,yytext());}
+
+{cero}			{return new java_cup.runtime.Symbol(sym.constEntera,yyline,yycolumn,yytext());}
+{enteroDecimal}		{return new java_cup.runtime.Symbol(sym.constEntera,yyline,yycolumn,yytext());}
+{enteroOctal}		{return new java_cup.runtime.Symbol(sym.constEntera,yyline,yycolumn,yytext());}
+{enteroHexadecimal}	{return new java_cup.runtime.Symbol(sym.constEntera,yyline,yycolumn,yytext());}
+
+{realDecimal}		{return new java_cup.runtime.Symbol(sym.constReal,yyline,yycolumn,yytext());}
+{realOctal}		{return new java_cup.runtime.Symbol(sym.constReal,yyline,yycolumn,yytext());}
+{realHexadecimal}	{return new java_cup.runtime.Symbol(sym.constReal,yyline,yycolumn,yytext());}
+
+{comentarioLinea}	{;}
+{comentarioParrafo}	{;}
+
+{constanteLiteral}	{return new java_cup.runtime.Symbol(sym.constLit,yyline,yycolumn,yytext().substring(1,yylength()-1).replace("\\'","'"));}
+
+{espacio}		{;}
+{saltos}		{;}
+{tabuladores}		{;}
