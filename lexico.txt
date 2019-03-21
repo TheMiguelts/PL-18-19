@@ -9,10 +9,14 @@ import java_cup.runtime.*;
 %column
 
 /* PALABRAS RESERVADAS */
-vacio = "void"
-entero = "int"
-real = "float"
-devolver = "return"
+entero = "INTEGER"
+real = "REAL"
+funcion="FUNCTION"
+procedimiento="PROCEDURE"
+begin="BEGIN"
+end="END"
+vacio="VOID"
+
 estIf = "if"
 estThen = "then"
 estElse = "else"
@@ -21,23 +25,29 @@ estWhile = "while"
 estDo = "do"
 estUntil = "until"
 estStruct = "struct"
+estRepetir="repeat"
 punto = "."
+to="to"
+downto="downto"
+programa="program"
+variables="var"
 
 /* OPERADORES */
 opMas = "+"
 opMenos = "-"
 opMultiplicacion = "*"
-opDivision = "/"
+opDivision = "div"
 opMayor = ">"
 opMenor = "<"
 opMayorIgual = ">="
 opMenorIgual = "<="
-opModulo = "%"
-opAsignacion = "="
-opIgual = "=="
+opModulo = "mod"
+opAsignacion = ":="
+opIgual = "="
 opNot = "not"
 opAnd = "and"
 opOr= "or"
+
 
 /* SIMBOLOS RESERVADOS */
 abrirP = "("
@@ -46,26 +56,25 @@ abrirLl = "{"
 cerrarLl = "}"
 puntoComa = ";"
 coma = ","
+dosPuntos=":"
 abrirC = "["
 cerrarC = "]"
 
 /* IDENTIFICADORES */
-identificadores = ([:letter:]|"&")([:letter:]|[0-9]|"$"|"_")*
+identificadores = ([:letter:])([:letter:]|[0-9]|"_")*
 
 /* NUMEROS ENTEROS */
 cero = "0"
 enteroDecimal = ("+"|"-")?[1-9][0-9]*
-enteroOctal = 0("+"|"-")?[0-9]+
-enteroHexadecimal = "0x"("+"|"-")?([0-9]|[A-F])+
 
 /* NUMEROS REALES */
 realDecimal = ("+"|"-")?([1-9][0-9]*+"."|"0.")[0-9]+
-realOctal = 0("+"|"-")?[0-9]+"."[0-9]+
-realHexadecimal = "0x"("+"|"-")?([0-9]|[A-F])+"."([0-9]|[A-F])+
+realExponencial = ("+"|"-")?([1-9][0-9]*+"."|"0.")("e"|"E")("+"|"-")?[0-9]*
+realMixto = [realDecimal]("e"|"E")("+"|"-")?[0-9]*
 
 /* COMENTARIOS */
-comentarioLinea = "//".*"\r\n"
-comentarioParrafo = "/*"(.|"\r\n")*"*/"
+comentarioLinea = "{"[^\n]"}"
+comentarioParrafo = "(*"(.|"\r\n")*"*)"
 
 /* CONSTANTES LITERALES */
 constanteLiteral = "'"([^"'"]|"\\'")+"'"
