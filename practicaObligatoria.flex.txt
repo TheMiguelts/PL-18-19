@@ -1,8 +1,9 @@
 import java_cup.runtime.*;
+import java.io.*;
 
 
 %%
-
+%unicode
 %line
 %class AnalizadorLexico
 %cup
