@@ -125,8 +125,8 @@ tabuladores = [\t]
 {puntoComa}		{return new java_cup.runtime.Symbol(sym.puntoComa,yyline,yycolumn);}
 {coma}			{return new java_cup.runtime.Symbol(sym.coma,yyline,yycolumn);}
 {dosPuntos}  {return new java_cup.runtime.Symbol(sym.dosPuntos,yyline,yycolumn);}
-{abrirC}		{return new java_cup.runtime.Symbol(sym.aperturaC,yyline,yycolumn);}
-{cerrarC}		{return new java_cup.runtime.Symbol(sym.cierreC,yyline,yycolumn);}
+{abrirC}		{return new java_cup.runtime.Symbol(sym.abrirC,yyline,yycolumn);}
+{cerrarC}		{return new java_cup.runtime.Symbol(sym.cerrarC,yyline,yycolumn);}
 
 {identificadores}	{return new java_cup.runtime.Symbol(sym.identificador,yyline,yycolumn,yytext());}
 
