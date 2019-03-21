@@ -1,0 +1,297 @@
+import java_cup.runtime.*;
+import java.io.*;
+import java.util.*;
+parser code{:
+
+	public void syntax_error(Symbol s){
+		report_error("Error encontrado en linea: "+s.left+ "columna: "+s.right,null);
+	}
+	public void unrecovered_syntax_error(Symbol s)throws java.lang.Exception{
+		report_fatal_error("Error encontrado en linea: "+s.left+"columna: "+s.right,null);
+	}
+:};
+terminal String identificador, abrirP, cerrarP, abrirLl, cerrarLl, coma, vacio, entero, real,
+puntoComa, opAsignacion, opMas, opMenos, opMultiplicacion, opDivision, opModulo, constEntera, constReal,
+constLit, estIf, estThen, estElse, estFor, estWhile, estDo, estUntil, opOr, opAnd, opNot, opIgual, opMenor,
+opMayor, opMenorIgual, opMayorIgual, punto, cerrarC, abrirC, define, devolver;
+
+non terminal Simbolo S;
+non terminal SimboloAux TYPE,OP,OPL,OPR,DEFINES;
+non terminal Sentencia SENT;
+non terminal Programa PROGRAM;
+non terminal ArrayList<Param> LISTPARAM;
+non terminal Bloque BLQ;
+non terminal ArrayList<SimboloAux> EXP,FACTOR,LEXP,LCOND,LCONDp,COND,LID,CTES;
+non terminal ArrayList<Sentencia> SENTLIST;
+non terminal Funcion RESTPART;
+non terminal PartePrograma PART,PARTES;
+
+
+precedence right opMultiplicacion, opMas;
+precedence right opMultiplicacion, opMenos;
+precedence right opMultiplicacion, opModulo;
+precedence right opDivision, opMas;
+precedence right opDivision, opMenos;
+precedence right opDivision, opModulo;
+
+precedence right opAnd, opOr;
+
+//EXTIENDE GRAMATICA PARA UNA MAYOR FACILIDAD A LA HORA DE GENERARLO
+S::=PROGRAM:program {:
+	Analizador.imprimir(program):};
+//DEFINE NO HAY EN PASCAL POR LO TANTO NO SE HACE ACCION CON DEFINE
+PROGRAM::=DEFINES PARTES:partes {:
+	RESULT=partes;:};
+//NO HAY DEFINE EN PASCAL, POR LO TANTO NO SE HACE ACCION RELACIONADA CON DEFINE
+DEFINES::= define identificador CTES DEFINES|;
+
+CTES::= constEntera:constEntera {:ArrayList<SimboloAux> simbolos = new ArrayList<SimboloAux>();
+				Constante constanteEntera = new Constante(constEntera);
+				simbolos.add(constanteEntera);
+				RESULT=simbolos;:}
+	| constReal:constReal {:ArrayList<SimboloAux> simbolos = new ArrayList<SimboloAux>();
+				Constante constanteReal = new Constante(constReal);
+				simbolos.add(constanteReal);
+				RESULT=simbolos;:}
+	| constLit:constLiteral {:ArrayList<SimboloAux> simbolos = new ArrayList<SimboloAux>();
+				Constante constanteLiteral = new Constante(constLiteral);
+				simbolos.add(constanteLiteral);
+				RESULT=simbolos;:};
+
+PARTES::= PART:part PARTES:partes {:
+	if (part instanceof Func){		// INSTANCE OF ---> PERTENECE
+		programa.addFunc(part);
+	else{
+		programa.addStruct(part);
+	}
+	RESULT=programa;:}
+	| PART:part {:
+	Programa programa=new Programa();
+	if (part instanceof Func){
+		programa.addFunc(part);
+	}else{
+		programa.addStruct(part);
+	}
+	RESULT=programa;
+	:};
+
+PART::= TYPE:type RESTPART:restpart{:
+	restpart.setType(type);
+	RESULT=restpart;:};
+
+RESTPART::= identificador:identificador abrirP LISTPARAM:listparam cerrarP BLQ:bloque{:
+		Funcion func=new Funcion();
+		func.setIdent(new Identificador(identificador));
+		func.setParams(listparam);
+		func.setBLQ(bloque);
+		RESULT=func;:}
+	//LAS FUNCIONES EN PASCAL DEBEN LLEVAR ALGO ENTRE PARENTESIS YA QUE LOS ARGUMENTOS SE PASA POR VALOR
+	| identificador abrirP vacio cerrarP BLQ;
+
+
+BLQ::= abrirLl SENTLIST:sentlist cerrarLl{:
+			Bloque bloque = new Bloque();
+			bloque.add("BEGIN");
+			bloque.setSents(sentlits);
+			bloque.add("END");
+			RESULT=bloque;:};
+
+LISTPARAM::= LISTPARAM:listparam coma TYPE:type identificador:identificador{:
+	listparam.add(new Param(type,new Identificador(identificador)));
+	RESULT=listparam;:}
+	| TYPE:type identificador:identificador{:
+		ArrayList<Param> params = new ArrayList<Param>();
+		params.add(new Param(type,new Identificador(identificador)));
+		RESULT=params;:};
+
+TYPE::= vacio //PASCAL NO HAY TIPO "void"
+	| entero{:SimboloAux simbolo=new SimboloAux("INTEGER");RESULT=simbolo;:}
+	| real{:SimboloAux simbolo=new SimboloAux("REAL");RESULT=simbolo;:};
+
+SENTLIST::= SENTLIST:sentlist SENT:sent {:
+		sentlist.add(sent);
+		RESULT=sentlist;:}
+	|SENT:sent {:
+		ArrayList<Sent> sentencias = new ArrayList<Sent>();
+		sentencias.add(sent);
+		RESULT=sentencias;:};
+
+SENT::= TYPE:type LID:lid puntoComa {:
+		SentenciaDeclaracion sentD=new SentenciaDeclaracion();
+		sentD.setType(type);
+		sentD.setIdents(lid);
+		RESULT=sentD;:}
+	| identificador:identificador opAsignacion EXP:exp puntoComa{:
+		Sentencia sent = new Sentencia();
+		sent.add(new Identificador(identificador));
+		sent.add(" ");
+		sent.add(":=");
+		sent.add(" ");
+		sent.add(exp);
+		sent.add(";");
+		RESULT=sent;:}
+	| identificador:identificador abrirP LEXP:lexp cerrarP puntoComa {:
+		SentenciaFuncion sentF = new SentenciaFuncion();
+		sentF.add(new Identificador(identificador));
+		sentF.add("(");
+		sentF.add(lexp);
+		sentF.add(")");
+		sentF.add(";");
+		RESULT=sentF;:}
+	//NO PUEDE LLEVAR UN NOMBRE FUNCION CON NADA ENTRE PARENTESIS, VALORES POR REFERENCIA (PASCAL)
+	| identificador abrirP cerrarP puntoComa
+	| devolver EXP:exp puntoComa{:
+		Sentencia sent=new Sentencia();
+		sent.add(); //AÑADIR NOMBRE FUNCION
+		sent.add(" ");
+		sent.add(":=");
+		sent.add(" ");
+		sent.add(exp);
+		sent.add(";");
+		RESULT=sent;:}
+	| estIf abrirP LCOND:lcond cerrarP estThen BLQ:bloqueIf estElse BLQ:bloqueElse{:
+		Bucle bucleIf=new Bucle();
+		Sentencia cabecera=new Sentencia();
+		cabecera.add("if");
+		cabecera.add("(");
+		cabecera.add(lcond);
+		cabecera.add(")");
+		cabecera.add("then");
+		bucleIf.add(cabecera);
+		bucleIf.add("BEGIN");
+		bucleIf.add(bloqueIf);
+		bucleIf.add("ELSE");
+		Sentencia sentenciaElse = new Sentencia();
+		sentenciaElse.add("else");
+		bucleIf.add(sentenciaElse);
+		bucleIf.add("BEGIN");
+		bucleIf.add(bloqueElse);
+		bucleIf.add("END");
+		RESULT=bucleIf;:}
+	| estWhile abrirP LCOND:lcond cerrarP BLQ:bloque{:
+		Bucle bucleWhile=new Bucle();
+		Sentencia sent=new Sentencia();
+		sent.add("while");
+		sent.add(" ");
+		sent.add("(");
+		sent.add(lcond);
+		sent.add(")");
+		bucleWhile.add(sent);
+		bucleWhile.add("BEGIN");
+		bucleWhile.add(bloque);
+		bucleWhile.add("END");
+		RESULT=bucleWhile;:}
+	//LA ESTRUCTURA DO...UNTIL NO APARECE EN PASCAL, POR LO TANTO NO SE RELACIONA CON NINGUNA ACCION SEMANTICA
+	| estDo BLQ estUntil abrirP LCOND cerrarP
+	| estFor abrirP identificador:identificador opAsignacion EXP:exp puntoComa LCOND:lcond puntoComa identificador:identificador1 opAsignacion EXP:exp1 cerrarP BLQ:bloque{:
+		Bucle bucleFor=new Bucle();
+		Sentencia sent=new Sentencia();
+		sent.add("for");
+		sent.add(" ");
+		sent.add("(");
+		sent.add(new Identificador(identificador));
+		sent.add(" := ");
+		sent.add(exp);
+		sent.add(";");
+		sent.add(lcond);
+		sent.add(";");
+		sent.add(new Identificador(identificador1);
+		sent.add(" := ");
+		sent.add(exp1);
+		sent.add(")");
+		bucleFor.add(sent);
+		bucleFor.add("BEGIN");
+		bucleFor.add(bloque);
+		bucleFor.add("END");
+		RESULT=bucleFor;:};
+
+LID::= identificador:identificador {:
+		ArrayList<SimboloAux> lid=new ArrayList<SimboloAux>();
+		lid.add(new Identificador(identificador));
+		RESULT=lid;:}
+	| LID:lid coma identificador:identificador {:
+		lid.add(new Identificador(identificador));
+		RESULT=lid;:};
+
+LEXP::= EXP:exp {:RESULT=exp;:}
+	| LEXP:lexp coma EXP:exp {:
+		lexp.add(new SimboloAux(",");
+		lexp.addAll(exp);
+		RESULT=lexp;:};
+
+EXP::= EXP:exp OP:op EXP:exp1 {:
+		exp.add(new SimboloAux(" "));
+		exp.add(op);
+		exp.add(new SimboloAux(" "));
+		exp.addAll(exp1);
+		RESULT=exp;:}
+	| FACTOR:factor {:
+		ArrayList<SimboloAux> simbolos=new ArrayList<SimboloAux>();
+		simbolos.addAll(factor);
+		simbolos.add(new SimboloAux(" ");
+		RESULT=factor;:};
+
+OP::= opMas 	{:SimboloAux simboloAux=new SimboloAux("+");RESULT=simboloAux;:}
+	| opMenos			{:SimboloAux simboloAux=new SimboloAux("-");RESULT=simboloAux;:}
+	| opMultiplicacion	{:SimboloAux simboloAux=new SimboloAux("*");RESULT=simboloAux;:}
+	| opDivision		{:SimboloAux simboloAux=new SimboloAux("div");RESULT=simboloAux;:}
+	| opModulo		{:SimboloAux simboloAux=new SimboloAux("mod");RESULT=simboloAux;:};
+
+FACTOR::= identificador:identificador abrirP LEXP:lexp cerrarP {:
+		ArrayList<SimboloAux> simbolos= new ArrayList<SimboloAux>();
+		simbolos.add(new Identificador(identificador));
+		simbolos.add(new SimboloAux("(");
+		simbolos.addAll(lexp);
+		simbolos.add(new SimboloAux(")");
+		RESULT=simbolos;:}
+	| identificador:identificador abrirP cerrarP {:
+		ArrayList<SimboloAux> simbolos= new ArrayList<SimboloAux>();
+		simbolos.add(new Identificador(identificador));
+		simbolos.add(new SimboloAux("(");
+		simbolos.add(new SimboloAux(")");
+		RESULT=simbolos;:}
+	| abrirP EXP:exp cerrarP {:
+		ArrayList<SimboloAux> simbolos= new ArrayList<SimboloAux>();
+		simbolos.add(new SimboloAux("(");
+		simbolos.addAll(exp);
+		simbolos.add(new SimboloAux(")");
+		RESULT=simbolos;:}
+	| identificador:identificador {:
+		ArrayList<SimboloAux> simbolos= new ArrayList<SimboloAux>();
+		simbolos.add(new Identificador(identificador));
+		RESULT=simbolos;:}
+	| CTES:ctes {:
+		ArrayList<SimboloAux> simbolos= new ArrayList<SimboloAux>();
+		simbolos.addAll(ctes);
+		RESULT=simbolos;:};
+//DUPLICA REGLA LCOND PARA ASI FAVORECER EL ENTENDIMIENTO
+LCOND ::= LCOND:lcond OPL:op LCONDp:lcondp {:
+		lcond.add(new SimboloAux(" ");
+		lcond.add(op);
+		lcond.add(new SimboloAux(" ");
+		lcond.addAll(lcondp);
+		RESULT=lcondp);:}
+	|LCONDp:lcondp{:
+		RESULT=lcondp;
+	:};
+LCONDp ::= COND:cond {:
+		RESULT=cond:}
+	| opNot COND:cond {:
+		cond.add(0,new SimboloAux("not"));
+		RESULT=cond;:};
+
+OPL ::= opOr		{:SimboloAux simboloAux=new SimboloAux("or");RESULT=simboloAux;:}
+	| opAnd		{:SimboloAux simboloAux=new SimboloAux("and");RESULT=simboloAux;:};
+
+COND ::= EXP:exp OPR:op EXP:exp1 {:
+		exp.add(new SimboloAux(" "));
+		exp.add(op);
+		exp.add(new SimboloAux(" "));
+		exp.addAll(exp1);
+		RESULT=exp; :};
+
+OPR::= opIgual	{:SimboloAux simboloAux =new SimboloAux("=");RESULT=simboloAux;:}
+	| opMenor	{:SimboloAux simboloAux =new SimboloAux("<");RESULT=simboloAux;:}
+	| opMayor	{:SimboloAux simboloAux =new SimboloAux(">");RESULT=simboloAux;:}
+	| opMayorIgual	{:SimboloAux simboloAux =new SimboloAux(">=");RESULT=simboloAux;:}
+	| opMenorIgual	{:SimboloAux simboloAux =new SimboloAux("<=");RESULT=simboloAux;:};
