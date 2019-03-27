@@ -1,49 +1,26 @@
-import java.io.*;
-
+import java.io.IOException;
+import java.io.PrintWriter;
+/**
+*/
 public class Analizador{
-	private static String nombreFichero;
 	public static void main(String argv[]){
-		if(argv.length==0){
-			System.out.println("Inserta nombre del archivo\n" + "( Usage: java Analizador <nombreArchivo>)");
-		}else{
-			AnalizadorLexico lexico=null;
-			try{
-				nombreFichero = argv[0];
-				lexico=new AnalizadorLexico(new FileReader(argv[0]));
-				parser sintactico=new parser(lexico);
-				sintactico.debug_parse();
-			}catch (FileNotFoundException e){
-				System.out.println("Archivo \""+argv[0]+"\" no encontrado.");
-			}catch (IOException e){
-				System.out.println("Error durante lectura de" + " archivo \""+argv[0]+"\".");
-				e.printStackTrace();
-			}catch (Exception e){
-				System.out.println("Excepcion: ");
-				e.printStackTrace();
+		String ruta="/sergiohernandezdominguez/Desktop/universidad/cuarto/pl/practica1819/PL-18-19/entrada.pas";
+		AnalizadorLexico lexico = null;
+		try {
+			lexico = new AnalizadorLexico( new java.io.FileReader(ruta));
+			parser sintactico = new parser(lexico);
+			sintactico.parse();
 			}
+		catch (java.io.FileNotFoundException e) {
+			System.out.println("Archivo no encontrado.");
 		}
-	}
-	public static void imprimir(Programa programa) throws IOException{
-		int numeroAux=0;
-		Func main=null;
-		for(Func func:program.getFunciones()){
-			if(func.ident.getSimb().equals("main")||func.ident.getSimb().equals("Main")){
-				numeroAux++;
-				main=func;
-			}
+		catch (java.io.IOException e) {
+		System.out.println("Error durante la lectura del archivo");
+		e.printStackTrace();
 		}
-		if (numeroAux>1){
-			System.err.println("Error, se ha encontrado mas de un main");
-		}else{
-			File fichero=new File(nombreFichero+".pas");
-			FileWriter fw=new FileWriter(fichero);
-			BufferedWriter bw=new BufferedWriter(fw);
-			bw.write(programa.escribir);
+		catch (Exception e) {
+		System.out.println("Excepcion:");
+		e.printStackTrace();
 		}
-		bw.flush();
-		bw.close();
 	}
 }
-	
-
-

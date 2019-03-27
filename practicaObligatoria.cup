@@ -14,10 +14,14 @@ terminal String identificador, abrirP, cerrarP, abrirLl, cerrarLl, coma, vacio, 
 puntoComa, opAsignacion, opMas, opMenos, opMultiplicacion, opDivision, opModulo, constEntera, cero, constReal,
 constLit, estIf, estThen, estElse, estFor, estWhile, estDo, estUntil, estRepetir, opOr, opAnd, opNot, opIgual, opMenor,
 opMayor, opMenorIgual, opMayorIgual, punto, cerrarC, abrirC, define, devolver, constRealExp, constRealMixto, to,
-programa, variables, dosPuntos, constante, unit;
+programa, variables, dosPuntos, constante, unit, lambda, begin, end, procedimiento, funcion, doPR, downto, enteroDecimal, realMixto, realExponencial, realDecimal,
+constanteLiteral, escribir;
 
-non terminal Simbolo S,TYPE,OP,OPL,OPR,DEFINES,SENT,PROGRAM,LISTPARAM,BLQ,EXP,
-FACTOR,LEXP,LCOND,LCONDp,COND,LID,CTES,SENTLIST,RESTPART,PART,PARTES;
+non terminal Simbolo S, PRG, BLQ, DCLLIST, SENTLIST, DCL,
+DEFCTE, CTELIST, SIMPVALUE, DEFVAR, DEFVARLIST, VARLIST,
+DEFPROC, DEFFUN, FORMAL_PARAMLIST, FORMAL_PARAM, TBAS,
+SENT, ASIG, ID, EXP, OP, OPARIT, FACTOR, SUBPPARAMLIST,
+EXPLIST, PROC_CALL, EXPCOND, OPLOG, FACTORCOND, OPCOMP,INC;
 
 
 precedence right opMultiplicacion, opMas;
@@ -28,68 +32,69 @@ precedence right opDivision, opMenos;
 precedence right opDivision, opModulo;
 
 precedence right opAnd, opOr;
+S::=PRG:prg;
 
-PRG::=programa identifier:identificador puntoComa BLQ:blq punto
-    | unit identifier:identificador puntoComa DCLLIST punto;
+PRG::=programa identificador puntoComa BLQ:blq punto
+    | unit identificador puntoComa DCLLIST:dcllist punto;
 
-BLQ ::= DCLLIST begin SENTLIST end;
+BLQ ::= DCLLIST:dcllist begin SENTLIST:sentlist end;
 
-DCLLIST ::= ʎ
-    | DCLLIST DCL;
+DCLLIST ::= lambda
+    | DCLLIST:dcllist DCL:dcl;
 
-SENTLIST ::= SENT
-    | SENTLIST SENT;
+SENTLIST ::= SENT:sent
+    | SENTLIST:sentlist SENT:sent;
 
-DCL ::= DEFCTE
-    | DEFVAR
-    | DEFPROC
-    | DEFFUN;
+DCL ::= DEFCTE:defcte
+    | DEFVAR:defvar
+    | DEFPROC:defproc
+    | DEFFUN:deffun;
 
-DEFCTE ::= constante CTELIST;
+DEFCTE ::= constante CTELIST:ctelist;
 
-CTELIST ::= identifier:identificador opIgual SIMPVALUE puntoComa
-    | CTELIST identifier:identificador opIgual SIMPVALUE puntoComa;
+CTELIST ::= identificador opIgual SIMPVALUE:simpvalue puntoComa
+    | CTELIST:ctelist identificador opIgual SIMPVALUE:simpvalue puntoComa;
 
-SIMPVALUE ::= numeric_integer_const: constEntera
-    | numeric_real_const: constReal
-    | string_const: constLit;
+SIMPVALUE ::= constEntera
+    | constReal
+    | constLit;
 
-DEFVAR ::= variables DEFVARLIST puntoComa;
+DEFVAR ::= variables DEFVARLIST:defvarlist puntoComa;
 
-DEFVARLIST ::= VARLIST dosPuntos TBAS
-    | DEFVARLIST puntoComa VARLIST dosPuntos TBAS;
+DEFVARLIST ::= VARLIST:varlist dosPuntos TBAS:tbas
+    | DEFVARLIST:defvarlist puntoComa VARLIST:varlist dosPuntos TBAS:tbas;
 
-VARLIST ::= identifier:identificador
-    | identifier coma VARLIST;
+VARLIST ::= identificador
+    | identificador coma VARLIST:varlist;
 
-DEFPROC ::= procedimiento identifier:identificador FORMAL_PARAMLIST puntoComa BLQ puntoComa;
+DEFPROC ::= procedimiento identificador FORMAL_PARAMLIST:formalParamList puntoComa BLQ:blq puntoComa;
 
-DEFFUN ::= funcion identifier:identificador FORMAL_PARAMLIST dosPuntos TBAS puntoComa BLQ puntoComa;
+DEFFUN ::= funcion identificador FORMAL_PARAMLIST:formalParamList dosPuntos TBAS:tbas puntoComa BLQ:blq puntoComa;
 
-FORMAL_PARAMLIST ::= ʎ
-    | abrirP FORMAL_PARAM cerrarP;
+FORMAL_PARAMLIST ::= lambda
+    | abrirP FORMAL_PARAM:formalParam cerrarP;
 
-FORMAL_PARAM ::= VARLIST dosPuntos TBAS
-    | VARLIST dosPuntos TBAS puntoComa FORMAL_PARAM;
+FORMAL_PARAM ::= VARLIST:varlist dosPuntos TBAS:tbas
+    | VARLIST:varlist dosPuntos TBAS:tbas puntoComa FORMAL_PARAM:formalParam;
 
 TBAS ::= entero
     | real;
 
-SENT ::= ASIG puntoComa
-    | PROC_CALL puntoComa
-    | estIf EXPCOND estThen BLQ estElse BLQ
-    | estWhile EXPCOND estDo BLQ
-    | estRepetir BLQ estUntil EXPCOND puntoComa
-    | estFor identifier:identificador opAsignacion EXP INC EXP do BLQ;
+SENT ::= ASIG:asig puntoComa
+    | PROC_CALL:proCall puntoComa
+    | estIf EXPCOND:expcond estThen BLQ:blq estElse BLQ:blq2
+    | estWhile EXPCOND:expcond estDo BLQ:blq
+    | estRepetir BLQ:blq estUntil EXPCOND:expcond puntoComa
+    | estFor identificador opAsignacion EXP:exp INC:inc EXP:exp2 doPR BLQ:blq;
 
-ASIG ::= ID opAsignacion EXP;
+ASIG ::= ID:id opAsignacion EXP:exp;
 
-ID := identifier:identificador;
+ID ::= identificador;
 
-EXP ::= EXP OP EXP
-    | FACTOR;
+EXP ::= EXP:exp OP:op EXP:exp2
+    | FACTOR:factor;
 
-OP ::= OPARIT;
+OP ::= OPARIT:oparit;
 
 OPARIT ::= opMas
     | opMenos
@@ -97,27 +102,27 @@ OPARIT ::= opMas
     | opDivision
     | opModulo;
 
-FACTOR ::= SIMPVALUE
-    | abrirP EXP cerrarP
-    | identifier:identificador SUBPPARAMLIST;
+FACTOR ::= SIMPVALUE:simpvalue
+    | abrirP EXP:exp cerrarP
+    | identificador SUBPPARAMLIST:subparamlist;
 
 SUBPPARAMLIST ::= lambda
-    | abrirP EXPLIST cerrarP;
+    | abrirP EXPLIST:explist cerrarP;
 
-EXPLIST ::= EXP
-    | EXP coma EXPLIST;
+EXPLIST ::= EXP:exp
+    | EXP:exp coma EXPLIST:explist;
 
-PROC_CALL ::= identifier:identificador SUBPPARAMLIST;
+PROC_CALL ::= identificador SUBPPARAMLIST:subparamlist;
 
-EXPCOND ::= EXPCOND OPLOG EXPCOND
-    | FACTORCOND;
+EXPCOND ::= EXPCOND:expcond OPLOG:oplog EXPCOND:expcond2
+    | FACTORCOND:factorcond;
 
 OPLOG ::= opOr
     | opAnd;
 
-FACTORCOND ::= EXP OPCOMP EXP
-    | abrirP EXP cerrarP
-    | opNot FACTORCOND;
+FACTORCOND ::= EXP:exp OPCOMP:opcomp EXP:exp2
+    | abrirP EXP:exp cerrarP
+    | opNot FACTORCOND:factorcond;
 
 OPCOMP ::= opMenor
     | opMayor
