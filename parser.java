@@ -327,10 +327,10 @@ public class parser extends java_cup.runtime.lr_parser {
 
 
 	public void syntax_error(Symbol s){
-		report_error("Error encontrado en linea: "+s.left+ "columna: "+s.right,null);
+		report_error(" // Error encontrado en linea: "+s.left+ " columna: "+s.right+" // ",null);
 	}
 	public void unrecovered_syntax_error(Symbol s)throws java.lang.Exception{
-		report_fatal_error("Error encontrado en linea: "+s.left+"columna: "+s.right,null);
+		report_fatal_error(" // Error encontrado en linea: "+s.left+" columna: "+s.right+" // ",null);
 	}
 
 
