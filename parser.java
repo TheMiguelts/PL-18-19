@@ -326,7 +326,6 @@ public class parser extends java_cup.runtime.lr_parser {
 
 
 
-
 	public void syntax_error(Symbol s){
 		report_error("Error encontrado en linea: "+s.left+ "columna: "+s.right,null);
 	}
