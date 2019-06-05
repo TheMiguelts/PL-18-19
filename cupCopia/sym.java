@@ -7,7 +7,7 @@
 public class sym {
   /* terminals */
   public static final int opAsignacion = 12;
-  public static final int realExponencial = 60;
+  public static final int realExponencial = 59;
   public static final int opIgual = 33;
   public static final int opMultiplicacion = 15;
   public static final int estElse = 24;
@@ -20,22 +20,22 @@ public class sym {
   public static final int opDivision = 16;
   public static final int estThen = 23;
   public static final int coma = 7;
-  public static final int doPR = 56;
+  public static final int doPR = 55;
   public static final int identificador = 2;
   public static final int estIf = 22;
-  public static final int procedimiento = 54;
-  public static final int begin = 52;
+  public static final int procedimiento = 53;
+  public static final int begin = 51;
   public static final int estRepetir = 29;
   public static final int opMenos = 14;
   public static final int cerrarLl = 6;
   public static final int real = 10;
   public static final int opMenor = 34;
-  public static final int downto = 57;
+  public static final int downto = 56;
   public static final int variables = 47;
-  public static final int end = 53;
-  public static final int escribir = 63;
+  public static final int end = 52;
+  public static final int escribir = 62;
   public static final int opMayor = 35;
-  public static final int realDecimal = 61;
+  public static final int realDecimal = 60;
   public static final int opMenorIgual = 36;
   public static final int opModulo = 17;
   public static final int estWhile = 26;
@@ -43,14 +43,14 @@ public class sym {
   public static final int constRealMixto = 44;
   public static final int constRealExp = 43;
   public static final int error = 1;
-  public static final int realMixto = 59;
+  public static final int realMixto = 58;
   public static final int opMayorIgual = 37;
   public static final int entero = 9;
   public static final int cero = 19;
   public static final int abrirLl = 5;
   public static final int punto = 38;
   public static final int opOr = 30;
-  public static final int funcion = 55;
+  public static final int funcion = 54;
   public static final int vacio = 8;
   public static final int constEntera = 18;
   public static final int constLit = 21;
@@ -63,13 +63,12 @@ public class sym {
   public static final int opMas = 13;
   public static final int cerrarC = 39;
   public static final int abrirP = 3;
-  public static final int enteroDecimal = 58;
+  public static final int enteroDecimal = 57;
   public static final int constante = 49;
   public static final int constReal = 20;
-  public static final int lambda = 51;
   public static final int to = 45;
   public static final int abrirC = 40;
-  public static final int constanteLiteral = 62;
+  public static final int constanteLiteral = 61;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
@@ -122,7 +121,6 @@ public class sym {
   "dosPuntos",
   "constante",
   "unit",
-  "lambda",
   "begin",
   "end",
   "procedimiento",
