@@ -10,10 +10,10 @@ public class Expresion {
 	}
 	
 	public StringBuffer mostrarExpresion() {
-		StringBuffer expresion = new StringBuffer();
+		StringBuffer sb = new StringBuffer();
 		for(Simbolo simbolo : simbolos)
-			expresion.append(simbolo.mostrarSimbolo() + " ");
-		return expresion;
+			sb.append(simbolo.mostrarSimbolo() + " ");
+		return sb;
 	}
 	
 }

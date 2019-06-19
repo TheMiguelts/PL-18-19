@@ -47,7 +47,7 @@ public class Sentencia {
 		e2 = new Expresion();		
 	}
 	
-	public StringBuffer imprimirSentencia() {
+	public StringBuffer mostrarSentencia() {
 		StringBuffer sb = new StringBuffer();
 		if(declaracionCte) {
 			for(Simbolo s : simbolos) {
@@ -105,24 +105,24 @@ public class Sentencia {
 				sb.append(imprimirTabs(Sentencia.contTabs) + "begin\r\n");
 				Sentencia.contTabs++;
 				for(Sentencia sent : bloque)
-					sb.append(sent.imprimirSentencia().toString() + "\r\n");
+					sb.append(sent.mostrarSentencia().toString() + "\r\n");
 				Sentencia.contTabs--;
 				sb.append(imprimirTabs(Sentencia.contTabs) + "end\r\n");
 				sb.append(imprimirTabs(Sentencia.contTabs) + "else\r\n").append(imprimirTabs(Sentencia.contTabs) + "begin\r\n");
 				Sentencia.contTabs++;
 				for(Sentencia sent : bloqueElse)
-					sb.append(sent.imprimirSentencia().toString() + "\r\n");
+					sb.append(sent.mostrarSentencia().toString() + "\r\n");
 				Sentencia.contTabs--;
 				sb.append(imprimirTabs(Sentencia.contTabs) + "end\r\n");
 			} else if(nombre.equals("while")) {
 				Sentencia sentAux = new Sentencia();
 				sentAux.simbolos = condicion;
 				sentAux.esCondicion = true;
-				sb.append(imprimirTabs(Sentencia.contTabs) + "while ").append(" " + sentAux.imprimirSentencia() + ") do").append("\r\n");
+				sb.append(imprimirTabs(Sentencia.contTabs) + "while ").append(" " + sentAux.mostrarSentencia() + ") do").append("\r\n");
 				sb.append(imprimirTabs(Sentencia.contTabs) + "begin\r\n");
 				Sentencia.contTabs++;
 				for(Sentencia sent : bloque)
-					sb.append(sent.imprimirSentencia().toString() + "\r\n");
+					sb.append(sent.mostrarSentencia().toString() + "\r\n");
 				Sentencia.contTabs--;
 				sb.append(imprimirTabs(Sentencia.contTabs) + "end\r\n");
 			} else if(nombre.equals("do")) {
@@ -133,10 +133,10 @@ public class Sentencia {
 				sb.append(imprimirTabs(Sentencia.contTabs) + "begin\r\n");
 				Sentencia.contTabs++;
 				for(Sentencia sent : bloque)
-					sb.append(sent.imprimirSentencia().toString() + "\r\n");
+					sb.append(sent.mostrarSentencia().toString() + "\r\n");
 				Sentencia.contTabs--;
 				sb.append(imprimirTabs(Sentencia.contTabs) + "end\r\n");
-				sb.append(imprimirTabs(Sentencia.contTabs) + "until ").append(" " + sentAux.imprimirSentencia() + ");").append("\r\n");
+				sb.append(imprimirTabs(Sentencia.contTabs) + "until ").append(" " + sentAux.mostrarSentencia() + ");").append("\r\n");
 			} else if(nombre.equals("for")) {
 				boolean forMas = true;
 				boolean forMenos = true;
@@ -160,11 +160,11 @@ public class Sentencia {
 						opeC = true;
 				}
 				if(forMas)
-					sb.append(imprimirTabs(Sentencia.contTabs) + "for " + idFor.mostrarSimbolo() + ":= " + e1.mostrarExpresion() + "to " + sentFor2Aux.imprimirSentencia() + "do\r\n");
+					sb.append(imprimirTabs(Sentencia.contTabs) + "for " + idFor.mostrarSimbolo() + ":= " + e1.mostrarExpresion() + "to " + sentFor2Aux.mostrarSentencia() + "do\r\n");
 				if(forMenos)
-					sb.append(imprimirTabs(Sentencia.contTabs) + "for " + idFor.mostrarSimbolo() + ":= " + e1.mostrarExpresion() + "downto " + sentFor2Aux.imprimirSentencia() + "do\r\n");
+					sb.append(imprimirTabs(Sentencia.contTabs) + "for " + idFor.mostrarSimbolo() + ":= " + e1.mostrarExpresion() + "downto " + sentFor2Aux.mostrarSentencia() + "do\r\n");
 				if((!forMas) && (!forMenos))
-					sb.append(imprimirTabs(Sentencia.contTabs) + "while (" + sentFor2.imprimirSentencia() + "do\r\n");
+					sb.append(imprimirTabs(Sentencia.contTabs) + "while (" + sentFor2.mostrarSentencia() + "do\r\n");
 				sb.append(imprimirTabs(Sentencia.contTabs) + "begin\r\n";
 				Sentencia.contTabs++;
 				for(Sentencia sent : bloque)
