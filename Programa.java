@@ -87,7 +87,7 @@ public class Programa {
 				if(f.nombre != null) {
 					if(!f.nombre.equals("main") {
 						if(f.t.equals(""))
-							sb.append(f.mostrarFuncion().toString());
+							sb.append(f.mostrarProcedure().toString());
 						else {
 							Programa.nombreFunc = new String(f.nombre);
 							sb.append(f.mostrarFuncion().toString());
@@ -99,7 +99,7 @@ public class Programa {
 				for(Funcion f : funciones) {
 					if(f.nombre != null) {
 						if(f.nombre.equals("main"))
-							sb.append(f.imprimirMain().toString() + "\r\n");
+							sb.append(f.mostrarMain().toString() + "\r\n");
 					}
 				}
 			} else
