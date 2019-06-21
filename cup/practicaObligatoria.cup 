@@ -159,21 +159,132 @@ DEFVAR ::= variables DEFVARLIST:defvarlist puntoComa {:
 		RESULT=defvarlist;
 :};
 
-DEFVARLIST ::= VARLIST:varlist dosPuntos TBAS:tbas
-    | DEFVARLIST:defvarlist puntoComa VARLIST:varlist dosPuntos TBAS:tbas;
+DEFVARLIST ::= VARLIST:varlist dosPuntos TBAS:tbas {:
+			Sentencia sentecia = new Sentencia();
+			Simbolo s = new Simbolo();
+			s.tipo = dosPuntos;
+			s.valor = ":";
+			s.simbolos.addAll(varlist.simbolos);
+			sentecia.simbolos.add(s);
+			sentecia.simbolos.add(tbas);
+			sentecia.simbolos.addAll(varlist.simbolos);
+			RESULT = sentecia;
+	:}
+    | DEFVARLIST:defvarlist puntoComa VARLIST:varlist dosPuntos TBAS:tbas {:
+			Sentencia sentencia = new Sentencia();
+			Simbolo s = new Simbolo();
+			s.tipo = puntoComa;
+			s.valor = ";";
+			sentecia.simbolos.add(tbas);
+			sentecia.simbolos.addAll(defvarlist.simbolos);
+			sentecia.simbolos.add(s);
+			RESULT = sentecia;
+	:};
 
-VARLIST ::= identificador
-    | identificador coma VARLIST:varlist;
+VARLIST ::= identificador {:
+			Sentencia sentencia = new Sentencia();
+			Simbolo s = new Simbolo();
+			s.tipo = identificador;
+			s.valor = identificador;
+			sentencia.simbolos.add(s);
+			RESULT = sentencia;
+	:}
+    | identificador coma VARLIST:varlist {:
+			Sentencia sentencia = new Sentencia();
+			Simbolo s = new Simbolo();
+			s.tipo = identificador;
+			s.valor = identificador;
+			Simbolo s2 = new Simbolo();
+			s2.tipo = coma;
+			s2.valor = ",";
+			sentencia.simbolos.add(s);
+			sentencia.simbolos.add(s2);
+			sentencia.simbolos.addAll(varlist.simbolos);
+			RESULT = sentencia;
+			:};
 
-DEFPROC ::= procedimiento identificador FORMAL_PARAMLIST:formalParamList puntoComa BLQ:blq puntoComa;
+DEFPROC ::= procedimiento identificador FORMAL_PARAMLIST:formalParamList puntoComa BLQ:blq puntoComa {:
+	Programa programa = new Programa();
+	Sentencia sentencia = new Sentencia();
+	Simbolo s = new Simbolo();
+	s.tipo = identificador;
+	s.valor = identificador;
+	Simbolo s2 = new Simbolo();
+	s2.tipo = parentesis;
+	s2.valor = "(";
+	Simbolo s3 = new Simbolo();
+	s3.tipo = parentesis;
+	s3.valor = ")";
+	sentencia.simbolos.add(s);
+	sentencia.simbolos.add(s2);
+	sentencia.simbolos.addAll(fromalParamList.simbolos);
+	sentencia.simbolos.add(s3);
+	programa.Sentencia.add(sentencia);
+	programa.Sentencia.addAll(blq.Sentencia);
+	RESULT = programa;
+	:}
 
-DEFFUN ::= funcion identificador FORMAL_PARAMLIST:formalParamList dosPuntos TBAS:tbas puntoComa BLQ:blq puntoComa;
+DEFFUN ::= funcion identificador FORMAL_PARAMLIST:formalParamList dosPuntos TBAS:tbas puntoComa BLQ:blq puntoComa {:
+	Programa programa = new Programa();
+	Sentencia sentencia = new Sentencia();
+	Simbolo s = new Simbolo();
+	s.tipo = identificador;
+	s.valor = identificador;
+	Simbolo s2 = new Simbolo();
+	s2.tipo = parentesis;
+	s2.valor = "(";
+	Simbolo s3 = new Simbolo();
+	s3.tipo = parentesis;
+	s3.valor = ")";
+	sentencia.simbolos.add(tbas);
+	sentencia.simbolos.add(s);
+	sentencia.simbolos.add(s2);
+	sentencia.simbolos.addAll(fromalParamList);
+	sentencia.simbolos.add(s3);
+	programa.Sentencia.add(sentencia);
+	programa.Sentencia.addAll(blq.Sentencia);
+	RESULT = programa;
+	:};
 
 FORMAL_PARAMLIST ::= LAMBDA
-    | abrirP FORMAL_PARAM:formalParam cerrarP;
+    | abrirP FORMAL_PARAM:formalParam cerrarP{:
+			Sentencia sentencia = new Sentencia();
+			Simbolo s = new Simbolo();
+			s.tipo = parentesis;
+			s.valor = "(";
+			Simbolo s2 = new Simbolo();
+			s2.tipo = parentesis;
+			s2.valor = ")";
+			sentencia.simbolos.add(s);
+			sentencia.simbolos.addAll(formalParam.simbolos);
+			sentencia.simbolos.add(s);
+			RESULT = sentencia;
+			:};
 
-FORMAL_PARAM ::= VARLIST:varlist dosPuntos TBAS:tbas
-    | VARLIST:varlist dosPuntos TBAS:tbas puntoComa FORMAL_PARAM:formalParam;
+FORMAL_PARAM ::= VARLIST:varlist dosPuntos TBAS:tbas {:
+		Sentencia sentencia = new Sentencia();
+		Simbolo s = new Simbolo();
+		s.tipo = dosPuntos;
+		s.valor = ":";
+		sentencia.simbolos.add(tbas);
+		sentencia.simbolos.addAll(varlist.simbolos);
+		sentencia.simbolos.add(s);
+		RESULT = sentencia;
+		:}
+    | VARLIST:varlist dosPuntos TBAS:tbas puntoComa FORMAL_PARAM:formalParam {:
+			Sentencia sentencia = new Sentencia();
+			Simbolo s = new Simbolo();
+			s.tipo = dosPuntos;
+			s.valor = ":";
+			Simbolo s2 = new Simbolo();
+			s2.tipo = puntoComa;
+			s2.valor = ";";
+			sentencia.simbolos.add(tbas);
+			sentencia.simbolos.addAll(varlist.simbolos);
+			sentencia.simbolos.add(s2);
+			sentencia.simbolos.addAll(formalParam.simbolos);
+			RESULT = sentencia;
+			:};
 
 TBAS ::= entero {:
 		Simbolo s=new Simbolo();
