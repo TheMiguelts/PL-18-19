@@ -156,8 +156,14 @@ SIMPVALUE ::= constEntera:cte {:
 ;
 
 DEFVAR ::= variables DEFVARLIST:defvarlist puntoComa {:
-		RESULT=defvarlist;
-:};
+	Sentencia sentencia = new Sentencia();
+	Simbolo s = new Simbolo();
+	s.tipo = puntoComa;
+	s.valor = ";";
+	defvarlist.simbolos.add(s);
+	sentencia.Sentencia.add(defvarlist);
+	RESULT = sentencia;
+	:};
 
 DEFVARLIST ::= VARLIST:varlist dosPuntos TBAS:tbas {:
 			Sentencia sentecia = new Sentencia();
@@ -496,12 +502,48 @@ OPARIT ::= opMas {:
 :}
 ;
 
-FACTOR ::= SIMPVALUE:simpvalue
-    | abrirP EXP:exp cerrarP
-    | identificador:id SUBPPARAMLIST:subparamlist;
+FACTOR ::= SIMPVALUE:simpvalue {:
+	Sentencia sentencia = new Sentencia();
+	sentencia.simbolos.add(simpvalue);
+	RESULT = sentencia;
+	:}
+    | abrirP EXP:exp cerrarP {:
+			Sentencia sentencia = new Sentencia();
+			Simbolo s = new Simbolo();
+			s.tipo = abrirP;
+			s.valor = "(";
+			Simbolo s2 = new Simbolo();
+			s2.tipo = cerrarP;
+			s2.valor = ")";
+			sentencia.simbolos.add(s);
+			sentencia.simbolos.addAll(exp.simbolos);
+			sentencia.simbolos.add(s2);
+			RESULT = sentencia;										
+			:}
+    | identificador:id SUBPPARAMLIST:subparamlist {:
+			Sentencia sentencia = new Sentencia();
+			Simbolo s = new Simbolo();
+			s.tipo = identificador;
+			s.valor = id;
+			sentencia.simbolos.add(s);
+			sentencia.addAll(explist.simbolos);
+			RESULT = sentencia;
+			:};
 
 SUBPPARAMLIST ::= LAMBDA
-    | abrirP EXPLIST:explist cerrarP;
+    | abrirP EXPLIST:explist cerrarP {:
+			Sentencia sentencia = new Sentencia();
+			Simbolo s = new Simbolo();
+			s.tipo = abrirP;
+			s.valor = "(";
+			Simbolo s2 = new Simbolo();
+			s2.tipo = cerrarP;
+			s2.valor = ")";
+			sentencia.simbolos.add(s);
+			sentencia.simbolos.addAll(explist.simbolos);
+			sentencia.simbolos.add(s2);
+			RESULT = sentencia;
+			:};
 
 EXPLIST ::= EXP:exp {:
 		RESULT=exp;
