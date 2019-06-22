@@ -236,7 +236,7 @@ DEFPROC ::= procedimiento identificador FORMAL_PARAMLIST:formalParamList puntoCo
 	programa.Sentencia.add(sentencia);
 	programa.Sentencia.addAll(blq.Sentencia);
 	RESULT = programa;
-	:}
+	:};
 
 DEFFUN ::= funcion identificador FORMAL_PARAMLIST:formalParamList dosPuntos TBAS:tbas puntoComa BLQ:blq puntoComa {:
 	Programa programa = new Programa();
@@ -526,7 +526,7 @@ FACTOR ::= SIMPVALUE:simpvalue {:
 			sentencia.simbolos.add(s);
 			sentencia.simbolos.addAll(exp.simbolos);
 			sentencia.simbolos.add(s2);
-			RESULT = sentencia;										
+			RESULT = sentencia;
 			:}
     | identificador:id SUBPPARAMLIST:subparamlist {:
 			Sentencia sentencia = new Sentencia();
