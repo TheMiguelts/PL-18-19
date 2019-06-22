@@ -52,12 +52,18 @@ PRG::=programa identificador puntoComa BLQ:blq punto {:
 :}
 ;
 BLQ ::= DCLLIST:dcllist begin SENTLIST:sentlist end {:
-
+		Sentencia sentencia=new Sentencia();
+		sentencia.declaraciones.addAll(dcllist);
+		sentencia.declaraciones.addAll(sentlist);
+		RESULT=sentencia;
 :};
 
 DCLLIST ::= LAMBDA
     | DCLLIST:dcllist DCL:dcl {:
-
+		Programa.contadorSentencias++;
+		dcl.numeroSentencia=Programa.contadorSentencias;
+		dcllist.declaraciones.addAll(dcl.declaraciones);
+		RESULT=dcllist;
 :};
 
 SENTLIST ::= SENT:sent {:
