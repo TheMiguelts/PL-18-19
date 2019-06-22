@@ -51,7 +51,9 @@ PRG::=programa identificador puntoComa BLQ:blq punto {:
 		RESULT=p;
 :}
 ;
-BLQ ::= DCLLIST:dcllist begin SENTLIST:sentlist end;
+BLQ ::= DCLLIST:dcllist begin SENTLIST:sentlist end {:
+
+:};
 
 DCLLIST ::= LAMBDA
     | DCLLIST:dcllist DCL:dcl {:
