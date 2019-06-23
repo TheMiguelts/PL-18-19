@@ -47,8 +47,8 @@ public class Simbolo {
 	public String mostrarSimbolo() {
 		if(tipo) {
 			switch(t) {
-				case "int": return "INTEGER";
-				case "float": return "REAL";
+				case "INTEGER": return "int";
+				case "REAL": return "float";
 				case "": return "";
 			}
 		} else if(opAritmetica) {
