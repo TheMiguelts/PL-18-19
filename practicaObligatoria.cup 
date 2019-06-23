@@ -121,7 +121,7 @@ CTELIST ::= identificador:id opIgual SIMPVALUE:simpvalue puntoComa {:
 		Sentencia sentencia=new Sentencia();
 		sentencia.declaracionCte=true;
 		Simbolo s_id=new Simbolo();
-		s_id.identificador=id;
+		s_id.id=id;
 		s_id.identificador=true;
 		Simbolo s_constante=simpvalue;
 		sentencia.simbolos.add(s_id);
@@ -134,7 +134,7 @@ CTELIST ::= identificador:id opIgual SIMPVALUE:simpvalue puntoComa {:
 		Sentencia sentencia=new Sentencia();
 		sentencia.declaracionCte=true;
 		Simbolo s_id=new Simbolo();
-		s_id.identificador=id;
+		s_id.id=id;
 		s_id.identificador=true;
 		Simbolo s_constante=simpvalue;
 		sentencia.simbolos.add(s_id);
@@ -146,20 +146,20 @@ CTELIST ::= identificador:id opIgual SIMPVALUE:simpvalue puntoComa {:
 
 SIMPVALUE ::= constEntera:cte {:
 		Simbolo s=new Simbolo();
-		s.esConstante=true;
-		s.valorConstante=cte;
+		s.constante=true;
+		s.cte=cte;
 		RESULT=s;
 :}
     | constReal:cte {:
 		Simbolo s=new Simbolo();
-		s.esConstante=true;
-		s.valorConstante=cte;
+		s.constante=true;
+		s.cte=cte;
 		RESULT=s;
 :}
     | constLit:cte {:
 		Simbolo s=new Simbolo();
-		s.esConstante=true;
-		s.esValorConstante=cte;
+		s.constante=true;
+		s.cte=cte;
 		RESULT=s;
 :}
 ;
@@ -167,8 +167,8 @@ SIMPVALUE ::= constEntera:cte {:
 DEFVAR ::= variables DEFVARLIST:defvarlist puntoComa {:
 	Sentencia sentencia = new Sentencia();
 	Simbolo s = new Simbolo();
-	s.tipo = "puntoComa";
-	s.valor = ";";
+	s.puntoYComa = puntoComa;
+	s.pyc = ";";
 	defvarlist.simbolos.add(s);
 	sentencia.Sentencia.add(defvarlist);
 	RESULT = sentencia;
@@ -188,8 +188,8 @@ DEFVARLIST ::= VARLIST:varlist dosPuntos TBAS:tbas {:
     | DEFVARLIST:defvarlist puntoComa VARLIST:varlist dosPuntos TBAS:tbas {:
 			Sentencia sentencia = new Sentencia();
 			Simbolo s = new Simbolo();
-			s.tipo = puntoComa;
-			s.valor = ";";
+			s.puntoYComa = puntoComa;
+			s.pyc = ";";
 			sentecia.simbolos.add(tbas);
 			sentecia.simbolos.addAll(defvarlist.simbolos);
 			sentecia.simbolos.add(s);
@@ -200,7 +200,7 @@ VARLIST ::= identificador:id {:
 			Sentencia sentencia = new Sentencia();
 			Simbolo s = new Simbolo();
 			s.tipo = "identificador";
-			s.valor = id;
+			s.id = id;
 			sentencia.simbolos.add(s);
 			RESULT = sentencia;
 	:}
