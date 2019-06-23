@@ -53,8 +53,8 @@ public class Simbolo {
 			}
 		} else if(opAritmetica) {
 			switch(op) {
-				case "/": return "div";
-				case "%": return "mod";
+				case "div": return "/";
+				case "mod": return "%";
 				case "+": return "+";
 				case "-": return "-";
 				case "*": return "*";
