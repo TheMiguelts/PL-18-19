@@ -35,17 +35,18 @@ precedence right opDivision, opMenos;
 precedence right opDivision, opModulo;
 precedence right opAnd, opOr;
 
-PRG::=programa identificador puntoComa BLQ:blq punto {:
+PRG::=programa identificador:id puntoComa BLQ:blq punto {:
 		Programa p=new Programa();
-		p.tipoPrograma=prog;
-		p.nombre=identificador;
+		p.tipoPrograma="programa";
+		p.nombre=id;
 		p.bloque=blq;
 		Programa.generarFichero(p.imprimir().toString());
 		RESULT=p;
 :}
-    | unit identificador puntoComa DCLLIST:dcllist punto {:
+    | unit identificador:id puntoComa DCLLIST:dcllist punto {:
 		Programa p=new Programa();
-		p.tipoPrograma=unit;
+		p.tipoPrograma="unit";
+		p.nombre=id
 		p.bloque=dcllist;
 		Programa.generarFichero(p.imprimir().toString());
 		RESULT=p;
@@ -166,7 +167,7 @@ SIMPVALUE ::= constEntera:cte {:
 DEFVAR ::= variables DEFVARLIST:defvarlist puntoComa {:
 	Sentencia sentencia = new Sentencia();
 	Simbolo s = new Simbolo();
-	s.tipo = puntoComa;
+	s.tipo = "puntoComa";
 	s.valor = ";";
 	defvarlist.simbolos.add(s);
 	sentencia.Sentencia.add(defvarlist);
@@ -195,19 +196,19 @@ DEFVARLIST ::= VARLIST:varlist dosPuntos TBAS:tbas {:
 			RESULT = sentecia;
 	:};
 
-VARLIST ::= identificador {:
+VARLIST ::= identificador:id {:
 			Sentencia sentencia = new Sentencia();
 			Simbolo s = new Simbolo();
-			s.tipo = identificador;
-			s.valor = identificador;
+			s.tipo = "identificador";
+			s.valor = id;
 			sentencia.simbolos.add(s);
 			RESULT = sentencia;
 	:}
-    | identificador coma VARLIST:varlist {:
+    | identificador:id coma VARLIST:varlist {:
 			Sentencia sentencia = new Sentencia();
 			Simbolo s = new Simbolo();
-			s.tipo = identificador;
-			s.valor = identificador;
+			s.tipo = "identificador";
+			s.valor = id;
 			Simbolo s2 = new Simbolo();
 			s2.tipo = coma;
 			s2.valor = ",";
