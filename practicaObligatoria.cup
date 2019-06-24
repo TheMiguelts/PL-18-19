@@ -1,0 +1,669 @@
+mport java_cup.runtime.*;
+import java.io.*;
+import java.util.*;
+parser code {:
+
+public void syntax_error (Symbol s){
+	System.err.println("Error de sintaxis (lexema <" + s.value.toString() + ">) en la linea " + s.left + " y en la columna " + s.right);
+	System.err.println("Error recuperado");
+}
+
+public void unrecovered_syntax_error(Symbol s){
+	System.err.println("Error de sintaxis no recuperable");
+}
+:};
+terminal String identificador, abrirP, cerrarP, abrirLl, cerrarLl, c, vacio, entero, real,
+puntoComa, opAsignacion, opMas, opMenos, opMultiplicacion, opDivision, opModulo, constEntera, cero, constReal,
+constLit, estIf, estThen, estElse, estFor, estWhile, estDo, estUntil, estRepetir, opOr, opAnd, opNot, opIgual, opMenor,
+opMayor, opMenorIgual, opMayorIgual, punto, cerrarC, abrirC, define, devolver, constRealExp, constRealMixto, to,
+programa, variables, dosPuntos, constante, unit, begin, end, procedimiento, funcion, doPR, downto, enteroDecimal, realMixto, realExponencial, realDecimal,
+constanteLiteral, escribir;
+
+non terminal PRG, BLQ, DCLLIST, SENTLIST, DCL,
+DEFCTE, CTELIST, SIMPVALUE, DEFVAR, DEFVARLIST, VARLIST,
+DEFPROC, DEFFUN, FORMAL_PARAMLIST, FORMAL_PARAM, TBAS,
+SENT, ASIG, ID, EXP, OP, OPARIT, FACTOR, SUBPPARAMLIST,
+EXPLIST, PROC_CALL, EXPCOND, OPLOG, FACTORCOND, OPCOMP,INC;
+non terminal LAMBDA;
+
+
+precedence right opMultiplicacion, opMas;
+precedence right opMultiplicacion, opMenos;
+precedence right opMultiplicacion, opModulo;
+precedence right opDivision, opMas;
+precedence right opDivision, opMenos;
+precedence right opDivision, opModulo;
+precedence right opAnd, opOr;
+
+PRG::=programa identificador:id puntoComa BLQ:blq punto {:
+		Programa p=new Programa();
+		p.nombreFunc="programa";
+		p.nombre=id;
+		p.declaraciones=blq;
+		Programa.generarFichero(p.imprimir().toString());
+		RESULT=p;
+:}
+    | unit identificador:id puntoComa DCLLIST:dcllist punto {:
+		Programa p=new Programa();
+		p.nombreFunc="unit";
+		p.nombre=id
+		p.declaraciones=dcllist;
+		Programa.generarFichero(p.imprimir().toString());
+		RESULT=p;
+:}
+;
+BLQ ::= DCLLIST:dcllist begin SENTLIST:sentlist end {:
+		Sentencia sentencia=new Sentencia();
+		sentencia.declaraciones.addAll(dcllist);
+		sentencia.declaraciones.addAll(sentlist);
+		RESULT=sentencia;
+:};
+
+DCLLIST ::= LAMBDA
+    | DCLLIST:dcllist DCL:dcl {:
+		Programa.contSents++;
+		dcl.numSentencia=Programa.contSents;
+		dcllist.declaraciones.addAll(dcl.declaraciones);
+		RESULT=dcllist;
+:};
+
+SENTLIST ::= SENT:sent {:
+		Funcion funcion=new Funcion();
+		Programa.contSents++;
+		sent.numSentencia=Programa.contSents;
+		if(sent.declaracionFunc){
+				funcion.declaraciones.add(sent);
+		}else if(sent.controlFlujo){
+				if(!sent.declaraciones.isEmpty()){
+						funcion.declaraciones.addAll(sent.declaraciones);
+				}
+				funcion.bloque.add(sent);
+		}else{
+				funcion.bloque.add(sent);
+		}
+		RESULT=funcion;
+:}
+    | SENTLIST:sentlist SENT:sent {:
+		Programa.contSents++;
+		sent.numSentencia=Programa.contSents;
+		if(sent.declaracionFunc){
+				sentlist.declaraciones.add(sent);
+		}else if(sent.controlFlujo){
+				if(!sent.declaraciones.isEmpty()){
+						sentlist.declaraciones.addAll(sent.declaraciones);
+				}
+				sentlist.bloque.add(sent);
+		}else{
+				sentlist.bloque.add(sent);
+		}
+		RESULT=sentlist;
+:};
+
+DCL ::= DEFCTE:defcte {:
+		RESULT=defcte;
+:}
+    | DEFVAR:defvar {:
+		RESULT=defvar;
+:}
+    | DEFPROC:defproc {:
+		RESULT=defproc;
+:}
+    | DEFFUN:deffun{:
+		RESULT=deffun;
+:};
+
+DEFCTE ::= constante CTELIST:ctelist {:
+		RESULT=ctelist;
+:};
+
+CTELIST ::= identificador:id opIgual SIMPVALUE:simpvalue puntoComa {:
+		Programa p =new Programa();
+		Sentencia sentencia=new Sentencia();
+		sentencia.declaracionCte=true;
+		Simbolo s_id=new Simbolo();
+		s_id.id=id;
+		s_id.identificador=true;
+		Simbolo s_constante=simpvalue;
+		sentencia.simbolos.add(s_id);
+		sentencia.simbolos.add(s_constante);
+		p.declaraciones.add(sentencia);
+		RESULT=p;
+:}
+    | CTELIST:ctelist identificador:id opIgual SIMPVALUE:simpvalue puntoComa {:
+		Programa p =new Programa();
+		Sentencia sentencia=new Sentencia();
+		sentencia.declaracionCte=true;
+		Simbolo s_id=new Simbolo();
+		s_id.id=id;
+		s_id.identificador=true;
+		Simbolo s_constante=simpvalue;
+		sentencia.simbolos.add(s_id);
+		sentencia.simbolos.add(s_constante);
+		p.declaraciones.add(sentencia);
+		p.declaracion.addAll(ctelist.declaraciones);
+		RESULT=p;
+:};
+
+SIMPVALUE ::= constEntera:cte {:
+		Simbolo s=new Simbolo();
+		s.constante=true;
+		s.cte=cte;
+		RESULT=s;
+:}
+    | constReal:cte {:
+		Simbolo s=new Simbolo();
+		s.constante=true;
+		s.cte=cte;
+		RESULT=s;
+:}
+    | constLit:cte {:
+		Simbolo s=new Simbolo();
+		s.constante=true;
+		s.cte=cte;
+		RESULT=s;
+:}
+;
+
+DEFVAR ::= variables DEFVARLIST:defvarlist puntoComa {:
+	Sentencia sentencia = new Sentencia();
+	Simbolo s = new Simbolo();
+	s.puntoYComa = puntoComa;
+	s.pyc = ";";
+	defvarlist.simbolos.add(s);
+	sentencia.Sentencia.add(defvarlist);
+	RESULT = sentencia;
+	:};
+
+DEFVARLIST ::= VARLIST:varlist dosPuntos TBAS:tbas {:
+			Sentencia sentecia = new Sentencia();
+			Simbolo s = new Simbolo();
+			s.tipo = dosPuntos;
+			s.valor = ":";
+			s.simbolos.addAll(varlist.simbolos);
+			sentecia.simbolos.add(s);
+			sentecia.simbolos.add(tbas);
+			sentecia.simbolos.addAll(varlist.simbolos);
+			RESULT = sentecia;
+	:}
+    | DEFVARLIST:defvarlist puntoComa VARLIST:varlist dosPuntos TBAS:tbas {:
+			Sentencia sentencia = new Sentencia();
+			Simbolo s = new Simbolo();
+			s.puntoYComa = puntoComa;
+			s.pyc = ";";
+			sentecia.simbolos.add(tbas);
+			sentecia.simbolos.addAll(defvarlist.simbolos);
+			sentecia.simbolos.add(s);
+			RESULT = sentecia;
+	:};
+
+VARLIST ::= identificador:id {:
+			Sentencia sentencia = new Sentencia();
+			Simbolo s = new Simbolo();
+			s.tipo = "identificador";
+			s.id = id;
+			sentencia.simbolos.add(s);
+			RESULT = sentencia;
+	:}
+    | identificador:id c VARLIST:varlist {:
+			Sentencia sentencia = new Sentencia();
+			Simbolo s = new Simbolo();
+			s.tipo = "identificador";
+			s.id = id;
+			Simbolo s2 = new Simbolo();
+			s2.tipo = c;
+			s2.c = ",";
+			sentencia.simbolos.add(s);
+			sentencia.simbolos.add(s2);
+			sentencia.simbolos.addAll(varlist.simbolos);
+			RESULT = sentencia;
+			:};
+
+DEFPROC ::= procedimiento identificador FORMAL_PARAMLIST:formalParamList puntoComa BLQ:blq puntoComa {:
+	Funcion funcion = new Funcion();
+	Sentencia sentencia = new Sentencia();
+	Simbolo s = new Simbolo();
+	s.tipo = identificador;
+	s.id = identificador;
+	Simbolo s2 = new Simbolo();
+	s2.tipo = parentesis;
+	s2.p = "(";
+	Simbolo s3 = new Simbolo();
+	s3.tipo = parentesis;
+	s3.p = ")";
+	sentencia.simbolos.add(s);
+	sentencia.simbolos.add(s2);
+	sentencia.simbolos.addAll(formalParamList.simbolos);
+	sentencia.simbolos.add(s3);
+	funcion.bloque.add(sentencia);
+	programa.bloque.addAll(blq.Sentencia);
+	RESULT = funcion;
+	:};
+
+DEFFUN ::= funcion identificador FORMAL_PARAMLIST:formalParamList dosPuntos TBAS:tbas puntoComa BLQ:blq puntoComa {:
+	Funcion funcion = new Funcion();
+	Sentencia sentencia = new Sentencia();
+	Simbolo s = new Simbolo();
+	s.tipo = identificador;
+	s.valor = identificador;
+	Simbolo s2 = new Simbolo();
+	s2.tipo = parentesis;
+	s2.valor = "(";
+	Simbolo s3 = new Simbolo();
+	s3.tipo = parentesis;
+	s3.valor = ")";
+	sentencia.simbolos.add(tbas);
+	sentencia.simbolos.add(s);
+	sentencia.simbolos.add(s2);
+	sentencia.simbolos.addAll(formalParamList);
+	sentencia.simbolos.add(s3);
+	funcion.bloque.add(sentencia);
+	funcion.bloque.addAll(blq.Sentencia);
+	RESULT = funcion;
+	:};
+
+FORMAL_PARAMLIST ::= LAMBDA
+    | abrirP FORMAL_PARAM:formalParam cerrarP{:
+			Sentencia sentencia = new Sentencia();
+			Simbolo s = new Simbolo();
+			s.tipo = parentesis;
+			s.p = "(";
+			Simbolo s2 = new Simbolo();
+			s2.tipo = parentesis;
+			s2.valor = ")";
+			sentencia.simbolos.add(s);
+			sentencia.simbolos.addAll(formalParam.simbolos);
+			sentencia.simbolos.add(s);
+			RESULT = sentencia;
+			:};
+
+FORMAL_PARAM ::= VARLIST:varlist dosPuntos TBAS:tbas {:
+		Sentencia sentencia = new Sentencia();
+		Simbolo s = new Simbolo();
+		s.tipo = dosPuntos;
+		s.valor = ":";
+		sentencia.simbolos.add(tbas);
+		sentencia.simbolos.addAll(varlist.simbolos);
+		sentencia.simbolos.add(s);
+		RESULT = sentencia;
+		:}
+    | VARLIST:varlist dosPuntos TBAS:tbas puntoComa FORMAL_PARAM:formalParam {:
+			Sentencia sentencia = new Sentencia();
+			Simbolo s = new Simbolo();
+			s.tipo = dosPuntos;
+			s.valor = ":";
+			Simbolo s2 = new Simbolo();
+			s2.tipo = puntoComa;
+			s2.valor = ";";
+			sentencia.simbolos.add(tbas);
+			sentencia.simbolos.addAll(varlist.simbolos);
+			sentencia.simbolos.add(s2);
+			sentencia.simbolos.addAll(formalParam.simbolos);
+			RESULT = sentencia;
+			:};
+
+TBAS ::= entero {:
+		Simbolo s=new Simbolo();
+		s.tipo=true;
+		s.t="INTEGER";
+		RESULT=s;
+:}
+    | real {:
+		Simbolo s=new Simbolo();
+		s.tipo=true;
+		s.t="REAL";
+		RESULT=s;
+:}
+;
+
+SENT ::= ASIG:asig puntoComa {:
+		Simbolo s=new Simbolo();
+		s.pyc=";";
+		s.puntoYComa=true;
+		Sentencia sentencia=new Sentencia();
+		sentencia.simbolos.add(s);
+		sentencia.simbolos.addAll(asig);
+		RESULT=sentencia;
+:}
+    | PROC_CALL:proCall puntoComa {:
+		Simbolo s=new Simbolo();
+		s.pyc=";";
+		s.puntoYComa=true;
+		Sentencia sentencia=new Sentencia();
+		sentencia.simbolos.add(s);
+		sentencia.simbolos.addAll(proCall);
+		RESULT=sentencia;
+:}
+    | estIf EXPCOND:expcond estThen BLQ:blq estElse BLQ:blq2 {:
+		Programa.contSents++;
+		Sentencia sentencia=new Sentencia();
+		sentencia.nombre="if";
+		for(Sentencia sAux: blq.declaraciones){
+			if(sAux.declaracionFunc){
+					sentencia.declaraciones.add(sAux);
+			}
+		}
+		for(Sentencia sAux: blq.bloque){
+				if(sAux.declaracionFunc){
+						sentencia.declaraciones.add(sAux);
+				}else{
+						sentencia.bloque.add(s);
+				}
+		}
+		for(Sentencia sAux: blq2.bloque){
+				if(sAux.declaracionFunc){
+						sentencia.declaraciones.add(sAux);
+				}else{
+						sentencia.bloqueElse.add(sAux);
+				}
+		}
+		sentencia.condicion.addAll(expcond.condicion);
+		sentencia.controlFlujo=true;
+		sentencia.numSentencia=Programa.contSents;
+		RESULT=sentencia;
+:}
+    | estWhile EXPCOND:expcond estDo BLQ:blq {:
+		Programa.contSents++;
+		Sentencia sentencia=new Sentencia();
+		sentencia.nombre="while";
+		for(Sentencia sAux: blq.declaraciones){
+				if(sAux.declaracionFunc){
+						sentencia.declaraciones.add(sAux);
+				}
+		}
+		for(Sentencia sAux: blq.bloque){
+				if(sAux.declaracionFunc){
+						sentencia.declaraciones.add(sAux);
+				}else{
+						sentencia.bloque.add(sAux);
+				}
+		}
+		sentencia.condicion.addAll(expcond.condicion);
+		sentencia.controlFlujo=true;
+		sentencia.numSentencia=Programa.contSents;
+		RESULT=sentencia;
+:}
+    | estRepetir BLQ:blq estUntil EXPCOND:expcond puntoComa {:
+		Programa.contSents++;
+		Sentencia sentencia=new Sentencia();
+		sentencia.nombre="repeat";
+		for(Sentencia sAux: blq.declaraciones){
+				if(sAux.declaracionFunc){
+						sentencia.declaraciones.add(sAux);
+				}
+		}
+		for(Sentencia sAux: blq.bloque){
+				if(sAux.declaracionFunc){
+						sentencia.declaraciones.add(sAux);
+				}else{
+						sentencia.bloque.add(sAux);
+				}
+		}
+		sentencia.condicion.addAll(expcond.condicion);
+		sentencia.controlFlujo=true;
+		sentencia.numSentencia=Programa.contSents;
+		RESULT=sentencia;
+:}
+    | estFor identificador:id opAsignacion EXP:exp INC:inc EXP:exp2 doPR BLQ:blq {:
+		Programa.contSents++;
+		Simbolo s=new Simbolo();
+		s.id=id;
+		s.identificador=true;
+		Simbolo s2=new Simbolo();
+		s.asig=":=";
+		s.asignacion=true;
+		Sentencia sentencia =new Sentencia();
+		sentencia.nombre="for"
+		for(Sentencia sAux: blq.declaraciones){
+				if(sAux.declaracionFunc){
+						sentencia.declaraciones.add(sAux);
+				}
+		}
+		sentencia.condFor1.add(s);
+		sentencia.condFor1.add(s2);
+		sentencia.condFor1.addAll(exp.condicion);
+		sentencia.condFor2.add(s);
+		sentencia.condFor2.add(inc.valor);
+		sentencia.condFor2.addAll(exp2.condicion);
+		for (Sentencia sAux : blq.bloque){
+				if (sAux.declaracionFunc){
+					sentencia.declaraciones.add(sAux);
+				}else {
+					sentencia.bloque.add(sAux);
+				}
+		}
+		sentencia.controlFlujo=true;
+		sentencia.esCondFor1=true;
+		sentecia.esCondFor2=true;
+		sentencia.identificadorFor=s;
+		sentencia.e1=exp;
+		sentecia.e2=exp2;
+		sentencia.numSentencia=Programa.contSents;
+		RESULT=sentecia;
+:};
+
+ASIG ::= ID:id opAsignacion EXP:exp {:
+		Programa.contSents++;
+		Simbolo s=new Simbolo();
+		s.id=id;
+		s.identificador=true;
+		Simbolo s2=new Simbolo();
+		s2.asig=":=";
+		s2.asignacion=true;
+		Sentencia sentencia=new Sentencia();
+		sentencia.simbolos.add(s);
+		sentencia.simbolos.add(s2);
+		sentencia.simbolos.addAll(exp.simbolos);
+		sentencia.numSentencia=Programa.contSents;
+		RESULT=sentencia;
+:};
+
+ID ::= identificador:id {:
+		RESULT=id;
+:};
+
+EXP ::= EXP:exp OP:op EXP:exp2 {:
+		Expresion e=new Expresion();
+		Simbolo s=new Simbolo();
+		s.opAritmetica=true;
+		s.op=op.operacion;
+		e.simbolos.addAll(exp.simbolos);
+		e.simbolos.add(s);
+		e.simbolos.addAll(exp2.simbolos);
+		RESULT=e;
+:}
+    | FACTOR:factor {:
+		RESULT=exp;
+:};
+
+OP ::= OPARIT:oparit {:
+		RESULT=oparit;
+:};
+
+OPARIT ::= opMas {:
+		Simbolo s=new Simbolo();
+		s.opAritmetica=true;
+		s.op="+";
+		RESULT=s;
+:}
+    | opMenos {:
+		Simbolo s=new Simbolo();
+		s.opAritmetica=true;
+		s.op="-";
+		RESULT=s;
+:}
+    | opMultiplicacion {:
+		Simbolo s=new Simbolo();
+		s.opAritmetica=true;
+		s.op="*";
+		RESULT=s;
+:}
+    | opDivision {:
+		Simbolo s=new Simbolo();
+		s.opAritmetica=true;
+		s.op="DIV";
+		RESULT=s;
+:}
+    | opModulo {:
+		Simbolo s=new Simbolo();
+		s.opAritmetica=true;
+		s.op="MOD";
+		RESULT=s;
+:}
+;
+
+FACTOR ::= SIMPVALUE:simpvalue {:
+	Sentencia sentencia = new Sentencia();
+	sentencia.simbolos.add(simpvalue);
+	RESULT = sentencia;
+	:}
+    | abrirP EXP:exp cerrarP {:
+			Sentencia sentencia = new Sentencia();
+			Simbolo s = new Simbolo();
+			s.tipo = abrirP;
+			s.valor = "(";
+			Simbolo s2 = new Simbolo();
+			s2.tipo = cerrarP;
+			s2.valor = ")";
+			sentencia.simbolos.add(s);
+			sentencia.simbolos.addAll(exp.simbolos);
+			sentencia.simbolos.add(s2);
+			RESULT = sentencia;
+			:}
+    | identificador:id SUBPPARAMLIST:subparamlist {:
+			Sentencia sentencia = new Sentencia();
+			Simbolo s = new Simbolo();
+			s.tipo = identificador;
+			s.valor = id;
+			sentencia.simbolos.add(s);
+			sentencia.addAll(explist.simbolos);
+			RESULT = sentencia;
+			:};
+
+SUBPPARAMLIST ::= LAMBDA
+    | abrirP EXPLIST:explist cerrarP {:
+			Sentencia sentencia = new Sentencia();
+			Simbolo s = new Simbolo();
+			s.tipo = abrirP;
+			s.valor = "(";
+			Simbolo s2 = new Simbolo();
+			s2.tipo = cerrarP;
+			s2.valor = ")";
+			sentencia.simbolos.add(s);
+			sentencia.simbolos.addAll(explist.simbolos);
+			sentencia.simbolos.add(s2);
+			RESULT = sentencia;
+			:};
+
+EXPLIST ::= EXP:exp {:
+		RESULT=exp;
+:}
+    | EXP:exp c EXPLIST:explist {:
+		Expresion expresion=new Expresion();
+		Simbolo s=new Simbolo();
+		s.coma=true;
+		s.c=",";
+		expresion.simbolos.addAll(exp.simbolos);
+		expresion.simbolos.add(s);
+		expresion.simbolos.addAll(explist.simbolos);
+		RESULT=expresion;
+:};
+
+PROC_CALL ::= identificador:id SUBPPARAMLIST:subparamlist {:
+		Simbolo s=new Simbolo();
+		s.id=id;
+		s.identificador=true;
+		Sentencia sentencia=new Sentencia();
+		sentecia.simbolos.add(s);
+		sentencia.simbolos.addAll(subparamlist);
+		RESULT=sentencia;
+:};
+
+EXPCOND ::= EXPCOND:expcond OPLOG:oplog EXPCOND:expcond2{:
+		expcond.condicion.add(oplog);
+		expcond.condicion.addAll(expcond2.condicion);
+		RESULT=expcond;
+:}
+    | FACTORCOND:factorcond{:
+		RESULT=factorcond;
+:}
+;
+
+OPLOG ::= opOr {:
+		Simbolo s=new Símbolo();
+		s.operacionL=true;
+		s.opL="||";
+		RESULT=s;
+:}
+    | opAnd {:
+		Simbolo s=new Simbolo();
+		s.operacionL=true;
+		s.opL="&&";
+		RESULT=s;
+:}
+;
+
+FACTORCOND ::= EXP:exp1 OPCOMP:opcomp EXP:exp2 {:
+		Simbolo s=new Simbolo();
+		s=opcomp;
+		Sentencia cf=new Sentencia();
+		cf.condicion.addAll(exp1.simbolos);
+		cf.condicion.add(opr);
+		cf.condicion.addAll(exp2.simbolos);
+		RESULT=cf;
+:}
+    | abrirP EXP:exp cerrarP {:
+		RESULT=exp;
+:}
+    | opNot FACTORCOND:factorcond {:
+		Simbolo s=new Simbolo();
+		s.neg="!";
+		s.negacion=true;
+		factorcond.condicion.add(0,s);
+		RESULT=factorcond;
+:};
+
+OPCOMP ::= opMenor {:
+		Simbolo s=new Simbolo();
+		s.operacionC=true;
+		s.opC="<";
+		RESULT=s;
+:}
+    | opMayor {:
+		Simbolo s=new Simbolo();
+		s.operacionC=true;
+		s.opC=">";
+		RESULT=s;
+:}
+    | opMenorIgual {:
+		Simbolo s=new Simbolo();
+		s.operacionC=true;
+		s.opC="<=";
+		RESULT=s;
+:}
+    | opMayorIgual {:
+		Simbolo s=new Simbolo();
+		s.operacionC=true;
+		s.opC=">=";
+		RESULT=s;
+:}
+    | opIgual {:
+		Simbolo s=new Simbolo();
+		s.operacionC=true;
+		s.opC="==";
+		RESULT=s;
+:};
+
+INC ::= to {:
+		Simbolo s=new Simbolo();
+		s.operacionC=false;
+		s.opC="++";
+		RESULT=s;
+:}
+    | downto {:
+		Simbolo s=new Simbolo();
+		s.operacionC=false;
+		s.opC="--";
+		RESULT=s;
+:}
+;
+LAMBDA ::= ;
