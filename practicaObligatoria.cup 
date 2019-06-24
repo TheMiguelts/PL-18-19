@@ -208,10 +208,10 @@ VARLIST ::= identificador:id {:
 			Sentencia sentencia = new Sentencia();
 			Simbolo s = new Simbolo();
 			s.tipo = "identificador";
-			s.valor = id;
+			s.id = id;
 			Simbolo s2 = new Simbolo();
 			s2.tipo = c;
-			s2.valor = ",";
+			s2.c = ",";
 			sentencia.simbolos.add(s);
 			sentencia.simbolos.add(s2);
 			sentencia.simbolos.addAll(varlist.simbolos);
@@ -223,13 +223,13 @@ DEFPROC ::= procedimiento identificador FORMAL_PARAMLIST:formalParamList puntoCo
 	Sentencia sentencia = new Sentencia();
 	Simbolo s = new Simbolo();
 	s.tipo = identificador;
-	s.valor = identificador;
+	s.id = identificador;
 	Simbolo s2 = new Simbolo();
 	s2.tipo = parentesis;
-	s2.valor = "(";
+	s2.p = "(";
 	Simbolo s3 = new Simbolo();
 	s3.tipo = parentesis;
-	s3.valor = ")";
+	s3.p = ")";
 	sentencia.simbolos.add(s);
 	sentencia.simbolos.add(s2);
 	sentencia.simbolos.addAll(fromalParamList.simbolos);
@@ -266,7 +266,7 @@ FORMAL_PARAMLIST ::= LAMBDA
 			Sentencia sentencia = new Sentencia();
 			Simbolo s = new Simbolo();
 			s.tipo = parentesis;
-			s.valor = "(";
+			s.p = "(";
 			Simbolo s2 = new Simbolo();
 			s2.tipo = parentesis;
 			s2.valor = ")";
@@ -309,16 +309,16 @@ TBAS ::= entero {:
 :}
     | real {:
 		Simbolo s=new Simbolo();
-		s.esTipado=true;
-		s.tipo="REAL";
+		s.tipo=true;
+		s.t="REAL";
 		RESULT=s;
 :}
 ;
 
 SENT ::= ASIG:asig puntoComa {:
 		Simbolo s=new Simbolo();
-		s.puntoYComa=";";
-		s.esPuntoComa=true;
+		s.pyc=";";
+		s.puntoYComa=true;
 		Sentencia sentencia=new Sentencia();
 		sentencia.simbolos.add(s);
 		sentencia.simbolos.addAll(asig);
@@ -326,8 +326,8 @@ SENT ::= ASIG:asig puntoComa {:
 :}
     | PROC_CALL:proCall puntoComa {:
 		Simbolo s=new Simbolo();
-		s.puntoYComa=";";
-		s.esPuntoComa=true;
+		s.pyc=";";
+		s.puntoYComa=true;
 		Sentencia sentencia=new Sentencia();
 		sentencia.simbolos.add(s);
 		sentencia.simbolos.addAll(proCall);
